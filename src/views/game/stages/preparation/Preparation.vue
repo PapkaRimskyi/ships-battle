@@ -1,7 +1,15 @@
 <template>
   <StageChangeButton v-if="areAllShipsDeployed" @click="emit('startGame', playerSlots)">В бой!</StageChangeButton>
-  <ShipsForDeploying :ships-for-deployment="shipsForDeployment" @pick-ship-type-for-deployment="pickShipTypeForDeployment" />
-  <Battlefield :player-slots="playerSlots" :ship-type-for-deployment="shipTypeForDeployment" @registration-ship="registrationShip" />
+  <ShipsForDeploying
+    :ship-type-for-deployment="shipTypeForDeployment"
+    :ships-for-deployment="shipsForDeployment"
+    @pick-ship-type-for-deployment="pickShipTypeForDeployment"
+  />
+  <Battlefield
+    :player-slots="playerSlots"
+    :ship-type-for-deployment="shipTypeForDeployment"
+    @registration-ship="registrationShip"
+  />
 </template>
 
 <script setup lang="ts">
