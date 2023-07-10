@@ -5,9 +5,9 @@
         class="ship-item"
         v-for="ship in shipsForDeployment"
         :key="ship.type"
-        :class="{ 'ship-item--inactive': ship.currentAmount === ship.maxAmount }"
+        :class="[ship.currentAmount === ship.maxAmount ? 'ship-item--inactive' : '']"
       >
-        <div class="ship-img-container" @click="ship.currentAmount !== ship.maxAmount ? emit('pickShipTypeForDeployment', ship.type) : null">
+        <div class="ship-img-container" :class="[shipTypeForDeployment === ship.type ? 'ship-img-container--active' : '']" @click="ship.currentAmount !== ship.maxAmount ? emit('pickShipTypeForDeployment', ship.type) : null">
           <img :src="`./src/assets/img/${ship.type}.png`" :alt="ship.type">
         </div>
         <p>{{ ship.name }} - {{ ship.currentAmount }} ({{ ship.maxAmount }})</p>
@@ -20,6 +20,7 @@
 import { SHIPS_TYPE_ENUM, ShipsForDeployment } from "@/const/ships";
 
 type TProps = {
+  shipTypeForDeployment: SHIPS_TYPE_ENUM | null,
   shipsForDeployment: typeof ShipsForDeployment,
 }
 
@@ -56,6 +57,14 @@ defineProps<TProps>();
   margin-right: 8px;
   width: 40px;
   height: 40px;
+
+  &:hover {
+    background-color: rgba(#68A3E5, .5);
+  }
+
+  &--active {
+    background-color: rgba(#68A3E5, .8);
+  }
 
   & img {
     width: 100%;
