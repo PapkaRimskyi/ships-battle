@@ -7,46 +7,29 @@ import { GAME_FIELDS, AI_FIELDS_START_ROW_NUMBER } from "@/const/game-field";
 import { getShipObject, ShipsForDeployment, SHIPS_TYPE_ENUM } from "@/const/ships";
 
 class AiPlayerModule implements IAiPlayerModule {
-  private slotsWithAIShip: TShipCellInfo = {};
+  private slots: TShipCellInfo = {};
   private shipListForDeploying = _.cloneDeep(ShipsForDeployment);
-  private playerFields = _.cloneDeep(GAME_FIELDS).slice(0, AI_FIELDS_START_ROW_NUMBER);
+  private enemyCells = _.cloneDeep(GAME_FIELDS).slice(0, AI_FIELDS_START_ROW_NUMBER).flat();
+  private deadPlayerCells: string[] = [];
 
-  private deleteShotCell(cell: string) {
-    const cellName = cell[0];
-    let emptyArray = null;
-    this.playerFields.forEach((field, i) => {
-      if (field[0][0] === cellName) {
-        const indexOfCurrentCell = field.findIndex((fieldCell) => fieldCell === cell);
-        if (field.length - 1 === 0) {
-          emptyArray = i;
-        }
-        return field.splice(indexOfCurrentCell, 1);
-      }
-    });
-    if (emptyArray) {
-      this.playerFields.splice(emptyArray, 1);
-    }
-  }
-
-  private getRandomCell(fields: typeof this.playerFields) {
-    const pickedColumn = fields[getRandomArbitrary(0, fields.length)];
-    return pickedColumn[getRandomArbitrary(0, pickedColumn.length)];
+  private deleteEnemyCell(randomIndex: number, cell: string) {
+    this.enemyCells.splice(randomIndex, 1);
+    this.deadPlayerCells.push(cell);
   }
 
   private addShip(type: SHIPS_TYPE_ENUM, randomCell: string) {
     const indexOfShipObject = this.shipListForDeploying.findIndex((ship) => ship.type === type);
     this.shipListForDeploying[indexOfShipObject].currentAmount += 1;
-    this.slotsWithAIShip[randomCell] = getShipObject(type)!;
+    this.slots[randomCell] = getShipObject(type)!;
   }
 
   private placeAllShips() {
-    const aiFields = GAME_FIELDS.slice(AI_FIELDS_START_ROW_NUMBER);
+    const aiFields = GAME_FIELDS.slice(AI_FIELDS_START_ROW_NUMBER).flat();
     this.shipListForDeploying.forEach((ship) => {
       while (ship.currentAmount !== ship.maxAmount) {
-        let randomCell = this.getRandomCell(aiFields);
-        while (randomCell in this.slotsWithAIShip) {
-          randomCell = this.getRandomCell(aiFields);
-        }
+        const randomIndex = getRandomArbitrary(0, aiFields.length);
+        const randomCell = aiFields[randomIndex];
+        aiFields.splice(randomIndex, 1);
         this.addShip(ship.type, randomCell);
       }
     });
@@ -57,17 +40,21 @@ class AiPlayerModule implements IAiPlayerModule {
   }
 
   public getListOfShips() {
-    return this.slotsWithAIShip;
+    return this.slots;
+  }
+
+  public getListOfDeadPlayerCells() {
+    return this.deadPlayerCells;
   }
 
   public sinkShip(cell: string) {
-    this.slotsWithAIShip[cell].isAlive = false;
+    this.slots[cell].isAlive = false;
   }
 
   public shot() {
-    const randomCell = this.getRandomCell(this.playerFields);
-    this.deleteShotCell(randomCell);
-    console.log(this.playerFields);
+    const randomIndex = getRandomArbitrary(0, this.enemyCells.length);
+    const randomCell = this.enemyCells[randomIndex];
+    this.deleteEnemyCell(randomIndex, randomCell);
     return randomCell;
   }
 }

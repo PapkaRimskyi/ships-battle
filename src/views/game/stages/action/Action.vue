@@ -1,32 +1,38 @@
 <template>
   <Battlefield
+    :player-slots="playerSlots"
     :player-table-type="PLAYER_ENUM.PLAYER"
-    :ship-slots="playerSlots"
+    :dead-cells="aiModule.getListOfDeadPlayerCells()"
   />
   <Battlefield
+    :player-slots="aiModule.getListOfShips()"
     :player-table-type="PLAYER_ENUM.AI"
-    :ship-slots="aiModule.getListOfShips()"
+    :dead-cells="deadAiCells"
     @do-player-shot="doPlayerShot"
   />
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch } from "vue";
 
 import Battlefield from './battlefield/Battlefield.vue';
 
 import AiPlayerModule from "@/helpers/ai-player-module/ai-player-module";
 
-import {TCellsWithShip} from "@/const/ships";
-import {PLAYER_ENUM} from "@/const/common";
+import { TCellsWithShip } from "@/const/ships";
+import { PLAYER_ENUM } from "@/const/common";
 
 type TProps = {
   playerSlots: TCellsWithShip,
+  deadAiCells: string[],
 }
 
 const props = defineProps<TProps>();
 const emit = defineEmits({
   destroyPlayerShip(cell: string) {
+    return typeof cell === 'string';
+  },
+  addNewDeadAiCell(cell: string) {
     return typeof cell === 'string';
   },
   endGame(winnerSide: PLAYER_ENUM) {
@@ -48,11 +54,14 @@ watch(turn, () => {
 });
 
 function doPlayerShot(cell: string) {
-  if (cell in aiModule.value.getListOfShips()) {
-    aiModule.value.sinkShip(cell);
-    checkAliveShips(aiModule.value.getListOfShips(), PLAYER_ENUM.PLAYER);
-  } else {
-    changePlayerTurn();
+  if (!props.deadAiCells.includes(cell)) {
+    emit("addNewDeadAiCell", cell);
+    if (cell in aiModule.value.getListOfShips()) {
+      aiModule.value.sinkShip(cell);
+      checkAliveShips(aiModule.value.getListOfShips(), PLAYER_ENUM.PLAYER);
+    } else {
+      changePlayerTurn();
+    }
   }
 }
 

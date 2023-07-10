@@ -7,6 +7,7 @@ export type TShipCellInfo = {
 export interface IAiPlayerModule {
   init: () => void,
   getListOfShips: () => TShipCellInfo,
+  getListOfDeadPlayerCells: () => string[],
   sinkShip: (cell: string) => void,
   shot: () => string,
 }
