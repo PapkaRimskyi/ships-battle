@@ -9,7 +9,7 @@
         v-for="cell in field"
         :id="cell"
         class="cell"
-        :class="[shipSlots[cell] && !shipSlots[cell]?.isAlive ? 'cell--ship-destroyed' : '', cellColorComputed]"
+        :class="[deadCells.includes(cell) ? 'cell--dead-cell' : '', cellColorComputed]"
         @click="playerTableType === PLAYER_ENUM.AI ? doPlayerShot($event, cell) : null"
         :key="cell"
       >
@@ -32,8 +32,9 @@ import { PLAYER_ENUM } from "@/const/common";
 import type { TCellsWithShip } from "@/const/ships";
 
 type TProps = {
+  playerSlots: TCellsWithShip,
   playerTableType: PLAYER_ENUM,
-  shipSlots: TCellsWithShip,
+  deadCells: string[],
 }
 
 const emit = defineEmits({
@@ -51,20 +52,19 @@ function getGameFieldsForRender() {
 }
 
 function doPlayerShot(e: Event, cell: string) {
-  console.log(cell);
   emit('doPlayerShot', cell);
 }
 
 function calculateConditionForShowingImg(cell: string) {
   if (props.playerTableType === PLAYER_ENUM.PLAYER) {
-    return props.shipSlots[cell];
+    return props.playerSlots[cell];
   }
-  return props.shipSlots[cell] && !props.shipSlots[cell].isAlive;
+  return props.playerSlots[cell] && !props.playerSlots[cell].isAlive;
 }
 
 function defineImgForShipInCell(cell: string) {
-  if (props.playerTableType === PLAYER_ENUM.PLAYER || (props.shipSlots[cell] && !props.shipSlots[cell].isAlive)) {
-    return props.shipSlots[cell].type;
+  if (props.playerTableType === PLAYER_ENUM.PLAYER || (props.playerSlots[cell] && !props.playerSlots[cell].isAlive)) {
+    return props.playerSlots[cell].type;
   }
 }
 </script>
@@ -125,8 +125,9 @@ function defineImgForShipInCell(cell: string) {
     background-color: rgba(darkred, .5);
   }
 
-  &--ship-destroyed {
+  &--dead-cell {
     opacity: .5;
+    pointer-events: none;
   }
 }
 </style>
