@@ -1,34 +1,38 @@
 <template>
-  <div style="display: flex;">
-    <BattleHistory
-      :dead-cells="deadAiCells"
-      :player-slots="aiModule.getListOfShips()"
-    />
-    <div>
-      <Battlefield
-        :player-slots="playerSlots"
-        :player-table-type="PLAYER_ENUM.PLAYER"
-        :dead-cells="aiModule.getListOfDeadPlayerCells()"
-      />
-      <Battlefield
-        :player-slots="aiModule.getListOfShips()"
-        :player-table-type="PLAYER_ENUM.AI"
+  <div class="action-screen-container">
+    <InterfaceOfRound :turn-number="turnNumber" :player-slots="playerSlots" :ai-slots="aiModule.getListOfShips()" />
+    <div style="display: flex;">
+      <BattleHistory
         :dead-cells="deadAiCells"
-        @do-player-shot="doPlayerShot"
+        :player-slots="aiModule.getListOfShips()"
+      />
+      <div>
+        <Battlefield
+          :player-slots="playerSlots"
+          :player-table-type="PLAYER_ENUM.PLAYER"
+          :dead-cells="aiModule.getListOfDeadPlayerCells()"
+        />
+        <Battlefield
+          :player-slots="aiModule.getListOfShips()"
+          :player-table-type="PLAYER_ENUM.AI"
+          :dead-cells="deadAiCells"
+          @do-player-shot="doPlayerShot"
+        />
+      </div>
+      <BattleHistory
+        :dead-cells="aiModule.getListOfDeadPlayerCells()"
+        :player-slots="playerSlots"
       />
     </div>
-    <BattleHistory
-      :dead-cells="aiModule.getListOfDeadPlayerCells()"
-      :player-slots="playerSlots"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref, watch} from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 
+import InterfaceOfRound from "@/views/game/stages/action/interface-of-round/InterfaceOfRound.vue";
 import Battlefield from './battlefield/Battlefield.vue';
-import BattleHistory from "@/views/game/components/sidebar/battle-history/BattleHistory.vue";
+import BattleHistory from "@/views/game/stages/action/battle-history/BattleHistory.vue";
 
 import AiPlayerModule from "@/helpers/ai-player-module/ai-player-module";
 
@@ -54,6 +58,7 @@ const emit = defineEmits({
 });
 
 const turn = ref(PLAYER_ENUM.PLAYER);
+const turnNumber = ref(1);
 const aiModule = reactive(new AiPlayerModule());
 
 onMounted(() => {
@@ -63,6 +68,7 @@ onMounted(() => {
 watch(turn, () => {
   if (turn.value === PLAYER_ENUM.AI) {
     doAIShot();
+    turnNumber.value += 1;
   }
 });
 
@@ -101,6 +107,9 @@ function checkAliveShips(playerSlots: TCellsWithShip, playerType: PLAYER_ENUM) {
 }
 </script>
 
-<style scoped>
-
+<style lang="css" module>
+  .action-screen-container {
+    display: flex;
+    flex-direction: row;
+  }
 </style>

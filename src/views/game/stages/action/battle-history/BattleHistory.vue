@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 
-import ShotMessage from "@/views/game/components/sidebar/battle-history/shot-message/ShotMessage.vue";
+import ShotMessage from "@/views/game/stages/action/battle-history/shot-message/ShotMessage.vue";
 
 import { TCellsWithShip } from "@/const/ships";
 
