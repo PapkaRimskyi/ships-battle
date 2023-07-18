@@ -1,17 +1,18 @@
 <template>
   <div class="interface-of-round-container">
-    <ShipsInfo :ships-number-by-category="test1" />
+    <ShipsInfo :ships-number-by-category="playerLife" />
     <RoundCounter>{{ turnNumber }}</RoundCounter>
-    <ShipsInfo :ships-number-by-category="test2" />
+    <ShipsInfo :ships-number-by-category="aiLife" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import ShipsInfo from "@/views/game/stages/action/interface-of-round/ships-info/ShipsInfo.vue";
 import RoundCounter from "@/views/game/stages/action/interface-of-round/round-counter/RoundCounter.vue";
 
-import type { TCellsWithShip } from "@/const/ships";
-import {computed} from "vue";
+import { TCellsWithShip } from "@/const/ships";
 
 type TProps = {
   turnNumber: number,
@@ -21,16 +22,20 @@ type TProps = {
 
 const props = defineProps<TProps>();
 
-const test1 = computed(() => count(props.playerSlots));
-const test2 = computed(() => count(props.aiSlots));
+const playerLife = computed(() => countShipsLife(props.playerSlots));
+const aiLife = computed(() => countShipsLife(props.aiSlots));
 
-function count(slots: TCellsWithShip) {
+function countShipsLife(slots: TCellsWithShip) {
   return Object.values(slots).reduce((acc, current) => {
-    if (current.type in acc) {
-      acc[current.type] += 1;
-    } else {
-      if (current.isAlive) {
+    if (current.isAlive) {
+      if (current.type in acc) {
+        acc[current.type] += 1;
+      } else {
         acc[current.type] = 1;
+      }
+    } else {
+      if (!(current.type in acc)) {
+        acc[current.type] = 0;
       }
     }
     return acc;
