@@ -1,34 +1,38 @@
 <template>
-  <div style="display: flex;">
-    <BattleHistory
-      :dead-cells="deadAiCells"
-      :player-slots="aiModule.getListOfShips()"
-    />
-    <div>
-      <Battlefield
-        :player-slots="playerSlots"
-        :player-table-type="PLAYER_ENUM.PLAYER"
-        :dead-cells="aiModule.getListOfDeadPlayerCells()"
-      />
-      <Battlefield
+  <div class="action-screen-container">
+    <InterfaceOfRound :turn-number="turnNumber" :playerSlots="player.slots" :aiSlots="aiModule.getListOfShips()" />
+    <div style="display: flex;">
+      <BattleHistory
+        :dead-cells="player.deadAiCells"
         :player-slots="aiModule.getListOfShips()"
-        :player-table-type="PLAYER_ENUM.AI"
-        :dead-cells="deadAiCells"
-        @do-player-shot="doPlayerShot"
+      />
+      <div>
+        <Battlefield
+          :player-slots="player.slots"
+          :player-table-type="PLAYER_ENUM.PLAYER"
+          :dead-cells="aiModule.getListOfDeadPlayerCells()"
+        />
+        <Battlefield
+          :player-slots="aiModule.getListOfShips()"
+          :player-table-type="PLAYER_ENUM.AI"
+          :dead-cells="player.deadAiCells"
+          @do-player-shot="doPlayerShot"
+        />
+      </div>
+      <BattleHistory
+        :dead-cells="aiModule.getListOfDeadPlayerCells()"
+        :player-slots="player.slots"
       />
     </div>
-    <BattleHistory
-      :dead-cells="aiModule.getListOfDeadPlayerCells()"
-      :player-slots="playerSlots"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref, watch} from "vue";
+import { onBeforeMount, reactive, ref, watch } from "vue";
 
+import InterfaceOfRound from "@/views/game/stages/action/interface-of-round/InterfaceOfRound.vue";
 import Battlefield from './battlefield/Battlefield.vue';
-import BattleHistory from "@/views/game/components/sidebar/battle-history/BattleHistory.vue";
+import BattleHistory from "@/views/game/stages/action/battle-history/BattleHistory.vue";
 
 import AiPlayerModule from "@/helpers/ai-player-module/ai-player-module";
 
@@ -36,42 +40,38 @@ import { TCellsWithShip } from "@/const/ships";
 import { PLAYER_ENUM } from "@/const/common";
 
 type TProps = {
-  playerSlots: TCellsWithShip,
-  deadAiCells: string[],
+  player: { slots: TCellsWithShip, deadAiCells: string[] },
 }
 
 const props = defineProps<TProps>();
 const emit = defineEmits({
-  destroyPlayerShip(cell: string) {
-    return typeof cell === 'string';
-  },
-  addNewDeadAiCell(cell: string) {
-    return typeof cell === 'string';
-  },
   endGame(winnerSide: PLAYER_ENUM) {
     return Boolean(PLAYER_ENUM[winnerSide]);
   }
 });
 
+const player = reactive(props.player);
+const aiModule = ref(new AiPlayerModule());
 const turn = ref(PLAYER_ENUM.PLAYER);
-const aiModule = reactive(new AiPlayerModule());
+const turnNumber = ref(1);
 
-onMounted(() => {
-  aiModule.init();
+onBeforeMount(() => {
+  aiModule.value.init();
 });
 
 watch(turn, () => {
   if (turn.value === PLAYER_ENUM.AI) {
     doAIShot();
+    turnNumber.value += 1;
   }
 });
 
 function doPlayerShot(cell: string) {
-  if (!props.deadAiCells.includes(cell)) {
-    emit("addNewDeadAiCell", cell);
-    if (cell in aiModule.getListOfShips()) {
-      aiModule.sinkShip(cell);
-      checkAliveShips(aiModule.getListOfShips(), PLAYER_ENUM.PLAYER);
+  if (!player.deadAiCells.includes(cell)) {
+    addNewDeadAiCell(cell);
+    if (cell in aiModule.value.getListOfShips()) {
+      aiModule.value.sinkShip(cell);
+      checkAliveShips(aiModule.value.getListOfShips(), PLAYER_ENUM.PLAYER);
     } else {
       changePlayerTurn();
     }
@@ -79,13 +79,21 @@ function doPlayerShot(cell: string) {
 }
 
 function doAIShot() {
-  const pickedCell = aiModule.shot();
-  if (pickedCell in props.playerSlots) {
-    emit("destroyPlayerShip", pickedCell);
-    checkAliveShips(props.playerSlots, PLAYER_ENUM.AI);
+  const pickedCell = aiModule.value.shot();
+  if (pickedCell in player.slots) {
+    destroyPlayerShip(pickedCell);
+    checkAliveShips(player.slots, PLAYER_ENUM.AI);
   } else {
     changePlayerTurn();
   }
+}
+
+function destroyPlayerShip(cell: string) {
+  player.slots[cell].isAlive = false;
+}
+
+function addNewDeadAiCell(cell: string) {
+  player.deadAiCells.push(cell);
 }
 
 function changePlayerTurn() {
@@ -101,6 +109,9 @@ function checkAliveShips(playerSlots: TCellsWithShip, playerType: PLAYER_ENUM) {
 }
 </script>
 
-<style scoped>
-
+<style lang="css" module>
+  .action-screen-container {
+    display: flex;
+    flex-direction: row;
+  }
 </style>

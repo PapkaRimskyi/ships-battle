@@ -3,10 +3,7 @@
     <Preparation v-if="mode === GAME_STAGE_ENUM.PREPARING" @start-game="startGame" />
     <Action
       v-else-if="mode === GAME_STAGE_ENUM.IN_ACTION"
-      :player-slots="player.slots"
-      :dead-ai-cells="player.deadAiCells"
-      @destroy-player-ship="destroyPlayerShip"
-      @add-new-dead-ai-cell="addNewDeadAiCell"
+      :player="player"
       @end-game="endGame"
     />
     <div v-else>
@@ -40,14 +37,6 @@ function startGame(slots: TCellsWithShip) {
 function endGame(winnerSide: PLAYER_ENUM) {
   mode.value = GAME_STAGE_ENUM.FINISHED;
   winner.value = winnerSide;
-}
-
-function destroyPlayerShip(cell: string) {
-  player.slots[cell].isAlive = false;
-}
-
-function addNewDeadAiCell(cell: string) {
- player.deadAiCells.push(cell);
 }
 </script>
 
