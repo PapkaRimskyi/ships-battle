@@ -105,7 +105,7 @@ function placeShip(e: Event) {
 .cell {
   width: 60px;
   height: 60px;
-  background-color: #68A3E5;
+  background-color: var(--player-battlefield-cell-color);
   border: 1px solid blue;
 
   & img {

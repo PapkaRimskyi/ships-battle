@@ -1,7 +1,7 @@
 <template>
   <div class="action-screen-container">
     <InterfaceOfRound :turn-number="turnNumber" :playerSlots="player.slots" :aiSlots="aiModule.getListOfShips()" />
-    <div style="display: flex;">
+    <div style="display: flex; background-color: rgba(255, 255, 255, .3); border-radius: 5px;">
       <BattleHistory
         :dead-cells="player.deadAiCells"
         :player-slots="aiModule.getListOfShips()"
