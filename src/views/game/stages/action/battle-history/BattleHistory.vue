@@ -32,7 +32,8 @@ watch(props.deadCells, () => {
 
 <style lang="scss" scoped>
 .container {
-  width: 120px;
+  padding: 5px;
+  width: 125px;
 }
 
 .heading-container {

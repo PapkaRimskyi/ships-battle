@@ -1,13 +1,14 @@
 @import './base.css';
 
 #app {
+  position: relative;
   margin: 0 auto;
   padding: 2rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  width: 100%;
-
   font-weight: normal;
+  z-index: 1000;
 }
 
 @media (min-width: 1024px) {

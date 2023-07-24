@@ -118,11 +118,11 @@ function defineImgForShipInCell(cell: string) {
   overflow: hidden;
 
   &--player {
-    background-color: rgba(darkgreen, .5);
+    background-color: var(--player-battlefield-cell-color);
   }
 
   &--enemy {
-    background-color: rgba(darkred, .5);
+    background-color: var(--enemy-battlefield-cell-color);
   }
 
   &--dead-cell {

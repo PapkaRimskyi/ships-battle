@@ -15,7 +15,7 @@
   padding: 20px 0;
   width: 102px;
   background: radial-gradient(circle 70px at 76% 27%, #cfe7fa ,#6393c1);
-  box-shadow: 0 0 16px 10px #b0c6d7;
+  box-shadow: 0 0 16px 10px #8aa5b5;
   border-radius: 50%;
 }
 

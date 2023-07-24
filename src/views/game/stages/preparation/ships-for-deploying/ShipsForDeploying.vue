@@ -55,15 +55,17 @@ defineProps<TProps>();
 
 .ship-img-container {
   margin-right: 8px;
+  padding: 2px;
   width: 40px;
   height: 40px;
+  border-radius: 5px;
 
   &:hover {
-    background-color: rgba(#68A3E5, .5);
+    background-color: rgba(#7FB585, .5);
   }
 
   &--active {
-    background-color: rgba(#68A3E5, .8);
+    background-color: rgba(#7FB585, 1);
   }
 
   & img {
