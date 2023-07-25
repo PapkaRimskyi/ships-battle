@@ -1,6 +1,11 @@
 <template>
   <div class="action-screen-container">
-    <InterfaceOfRound :turn-number="turnNumber" :playerSlots="player.slots" :aiSlots="aiModule.getListOfShips()" />
+    <InterfaceOfRound
+      :turn="turn"
+      :turn-number="turnNumber"
+      :playerSlots="player.slots"
+      :aiSlots="aiModule.getListOfShips()"
+    />
     <div style="display: flex; background-color: rgba(255, 255, 255, .3); border-radius: 5px;">
       <BattleHistory
         :dead-cells="player.deadAiCells"
@@ -38,6 +43,7 @@ import AiPlayerModule from "@/helpers/ai-player-module/ai-player-module";
 
 import { TCellsWithShip } from "@/const/ships";
 import { PLAYER_ENUM } from "@/const/common";
+import {getRandomArbitrary} from "@/helpers/common";
 
 type TProps = {
   player: { slots: TCellsWithShip, deadAiCells: string[] },
@@ -61,13 +67,16 @@ onBeforeMount(() => {
 
 watch(turn, () => {
   if (turn.value === PLAYER_ENUM.AI) {
-    doAIShot();
-    turnNumber.value += 1;
+    const randomDelayNumber = getRandomArbitrary(1000, 5000);
+    setTimeout(() => {
+      doAIShot();
+      turnNumber.value += 1;
+    }, randomDelayNumber);
   }
 });
 
 function doPlayerShot(cell: string) {
-  if (!player.deadAiCells.includes(cell)) {
+  if (!player.deadAiCells.includes(cell) && turn.value !== PLAYER_ENUM.AI) {
     addNewDeadAiCell(cell);
     if (cell in aiModule.value.getListOfShips()) {
       aiModule.value.sinkShip(cell);

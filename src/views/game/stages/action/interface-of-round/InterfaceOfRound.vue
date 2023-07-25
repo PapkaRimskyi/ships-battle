@@ -1,7 +1,11 @@
 <template>
   <div class="interface-of-round-container">
     <ShipsInfo :ships-number-by-category="playerLife" />
-    <RoundCounter>{{ turnNumber }}</RoundCounter>
+    <div class="count-container">
+      <TurnIndicator player-type="PLAYER" :turn="turn" />
+      <RoundCounter>{{ turnNumber }}</RoundCounter>
+      <TurnIndicator player-type="AI" :turn="turn" />
+    </div>
     <ShipsInfo :ships-number-by-category="aiLife" />
   </div>
 </template>
@@ -10,11 +14,15 @@
 import { computed } from 'vue';
 
 import ShipsInfo from "@/views/game/stages/action/interface-of-round/ships-info/ShipsInfo.vue";
+import TurnIndicator from "@/views/game/stages/action/interface-of-round/turn-indicator/TurnIndicator.vue";
 import RoundCounter from "@/views/game/stages/action/interface-of-round/round-counter/RoundCounter.vue";
 
 import { TCellsWithShip } from "@/const/ships";
+import type { PLAYER_ENUM } from "@/const/common";
+
 
 type TProps = {
+  turn: PLAYER_ENUM,
   turnNumber: number,
   playerSlots: TCellsWithShip,
   aiSlots: TCellsWithShip,
@@ -48,5 +56,9 @@ function countShipsLife(slots: TCellsWithShip) {
     margin-bottom: 60px;
     display: flex;
     justify-content: space-evenly;
+  }
+
+  .count-container {
+    position: relative;
   }
 </style>
